@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { motion } from "framer-motion"
-import { Shield, Sword, Trophy, Zap, Settings } from "lucide-react"
+import { Shield, Sword, Trophy, Zap, Settings, BarChart3 } from "lucide-react"
 
 // ...
 
@@ -15,8 +15,9 @@ interface ProfileStatsProps {
   level: number
   displayName: string
   onEditProfile: () => void
+  onOpenAnalytics: () => void
 }
-export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, level, displayName, onEditProfile }: ProfileStatsProps) {
+export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, level, displayName, onEditProfile, onOpenAnalytics }: ProfileStatsProps) {
   const xpProgress = ((xp % 3) / 3) * 100
 
   return (
@@ -33,14 +34,26 @@ export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, l
         <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#00f3ff]" />
         <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#00f3ff]" />
 
-        {/* Edit Button */}
-        <button
-          onClick={onEditProfile}
-          className="absolute top-14 right-4 p-1.5 rounded border border-[#00f3ff]/30 bg-[#00f3ff]/10 text-[#00f3ff] hover:bg-[#00f3ff]/20 hover:border-[#00f3ff] transition-all z-20"
-          aria-label="Edit Profile"
-        >
-          <Settings className="w-4 h-4" />
-        </button>
+        {/* Buttons Container */}
+        <div className="absolute top-14 right-4 z-20 flex flex-col gap-2">
+          {/* Edit Button */}
+          <button
+            onClick={onEditProfile}
+            className="p-1.5 rounded border border-[#00f3ff]/30 bg-[#00f3ff]/10 text-[#00f3ff] hover:bg-[#00f3ff]/20 hover:border-[#00f3ff] transition-all"
+            aria-label="Edit Profile"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
+
+          {/* Analytics Button */}
+          <button
+            onClick={onOpenAnalytics}
+            className="p-1.5 rounded border border-[#00ff88]/30 bg-[#00ff88]/10 text-[#00ff88] hover:bg-[#00ff88]/20 hover:border-[#00ff88] transition-all"
+            aria-label="View Analytics"
+          >
+            <BarChart3 className="w-4 h-4" />
+          </button>
+        </div>
 
         {/* Header */}
         <div className="text-center">

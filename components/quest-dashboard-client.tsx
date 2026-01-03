@@ -8,11 +8,11 @@ import { ArchiveSection } from "@/components/archive-section"
 import { NewQuestButton } from "@/components/new-quest-button"
 import { NewQuestModal } from "@/components/new-quest-modal"
 import { SettingsModal } from "@/components/settings-modal"
+import { AnalyticsModal } from "@/components/analytics-modal"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import type { Quest, QuestStatus, Profile } from "@/lib/types"
 import type { User } from "@supabase/supabase-js"
-
 
 
 function getNextDeadline(currentDeadline: string | Date, frequency: Quest["frequency"]): Date {
@@ -80,6 +80,7 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
   const [profile, setProfile] = useState<Profile>(userProfile)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false)
   const supabase = createClient()
 
   // Offline Detection
@@ -395,13 +396,14 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
         className={`flex flex-col lg:flex-row gap-6 p-4 lg:p-6 ${isOnline ? "pt-20" : "pt-32"} transition-all duration-300`}
       >
         <ProfileStats
-          completedQuests={profile.xp} // Note: This mapping seems odd (xp vs completed), keeping logic as is effectively
+          completedQuests={profile.xp}
           activeQuests={activeCount}
           totalQuests={totalQuests}
           xp={profile.xp}
           level={profile.level}
           displayName={profile.display_name}
           onEditProfile={() => setIsSettingsOpen(true)}
+          onOpenAnalytics={() => setIsAnalyticsOpen(true)}
         />
 
         <main className="flex-1 space-y-8">
@@ -450,6 +452,11 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
         onClose={() => setIsSettingsOpen(false)}
         onSubmit={handleUpdateProfile}
         profile={profile}
+      />
+      <AnalyticsModal
+        isOpen={isAnalyticsOpen}
+        onClose={() => setIsAnalyticsOpen(false)}
+        quests={quests}
       />
     </div>
   )
