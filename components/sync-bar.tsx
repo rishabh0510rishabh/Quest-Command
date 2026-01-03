@@ -45,8 +45,8 @@ export function SyncBar({ isOnline, onToggle, user }: SyncBarProps) {
 
           <div className="flex items-center gap-4">
             {user && (
-              <div className="hidden sm:flex items-center gap-3">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded border border-[#1a1a1a] bg-[#0a0a0a]/50">
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded border border-[#1a1a1a] bg-[#0a0a0a]/50">
                   <User className="w-3 h-3 text-[#00f3ff]" />
                   <span className="text-[#00f3ff] text-xs tracking-wider truncate max-w-32">{user.email}</span>
                 </div>
