@@ -61,7 +61,7 @@ export default async function AuthErrorPage({
 
             {/* Back to login */}
             <Link
-              href="/auth/login"
+              href="/"
               className="inline-flex items-center gap-2 text-[#00f3ff] text-sm hover:underline tracking-wider"
             >
               RETRY_CONNECTION

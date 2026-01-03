@@ -7,7 +7,7 @@ export default async function DashboardPage() {
   const { data: { user }, error: userError } = await supabase.auth.getUser()
 
   if (userError || !user) {
-    redirect("/auth/login")
+    redirect("/")
   }
 
   // Fetch initial quests

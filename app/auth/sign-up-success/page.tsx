@@ -1,10 +1,15 @@
 "use client"
 
+import { useRef, useEffect, useState, Suspense } from "react"
 import { motion } from "framer-motion"
 import { Mail, CheckCircle, Terminal } from "lucide-react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 
-export default function SignUpSuccessPage() {
+function SuccessContent() {
+  const searchParams = useSearchParams()
+  const email = searchParams.get("email")
+
   return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden scanlines">
       {/* Background grid effect */}
@@ -91,14 +96,14 @@ export default function SignUpSuccessPage() {
                 <span className="text-[#00f3ff] text-sm tracking-wider">CHECK_INBOX</span>
               </div>
               <p className="text-[#888] text-xs leading-relaxed">
-                A verification link has been transmitted to your email address. Click the link to activate your
+                A verification link has been transmitted to {email ? <span className="text-[#00ff88]">{email}</span> : "your email address"}. Click the link to activate your
                 operative credentials.
               </p>
             </motion.div>
 
             {/* Back to login */}
             <Link
-              href="/auth/login"
+              href="/"
               className="inline-flex items-center gap-2 text-[#00f3ff] text-sm hover:underline tracking-wider"
             >
               RETURN_TO_TERMINAL
@@ -113,5 +118,13 @@ export default function SignUpSuccessPage() {
         </div>
       </motion.div>
     </div>
+  )
+}
+
+export default function SignUpSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
+      <SuccessContent />
+    </Suspense>
   )
 }

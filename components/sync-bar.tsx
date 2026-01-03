@@ -21,7 +21,7 @@ export function SyncBar({ isOnline, onToggle, user }: SyncBarProps) {
     setIsLoggingOut(true)
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.push("/auth/login")
+    router.push("/")
   }
 
   return (

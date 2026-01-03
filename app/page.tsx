@@ -4,6 +4,7 @@ import type React from "react"
 
 import { createClient } from "@/lib/supabase/client"
 import { Lock, Mail, AlertTriangle, Loader2, Terminal, UserPlus } from "lucide-react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
@@ -52,10 +53,14 @@ export default function AuthPage() {
           },
         })
         if (error) throw error
-        router.push("/auth/sign-up-success")
+        router.push(`/auth/sign-up-success?email=${encodeURIComponent(email)}`)
       }
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : isLogin ? "ACCESS DENIED" : "REGISTRATION FAILED")
+    } catch (error: any) {
+      if (!isLogin && (error.message?.includes("already registered") || error.code === 'user_already_exists')) {
+        setError("ACCOUNT ALREADY EXISTS - PLEASE LOGIN")
+      } else {
+        setError(error instanceof Error ? error.message : isLogin ? "ACCESS DENIED" : "REGISTRATION FAILED")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -181,13 +186,25 @@ export default function AuthPage() {
                 </div>
               )}
 
+              {/* Forgot Password Link */}
+              {isLogin && (
+                <div className="text-right">
+                  <Link
+                    href="/auth/reset-password"
+                    className="text-[#00f3ff]/70 text-[10px] hover:text-[#00f3ff] hover:underline tracking-wider transition-colors"
+                  >
+                    FORGOT_ACCESS_KEY?
+                  </Link>
+                </div>
+              )}
+
               {/* Submit button */}
               <button
                 type="submit"
                 disabled={isLoading}
                 className={`w-full border rounded py-3 font-bold text-sm tracking-widest disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${isLogin
-                    ? 'bg-[#00f3ff]/10 border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff]/20'
-                    : 'bg-[#00ff88]/10 border-[#00ff88] text-[#00ff88] hover:bg-[#00ff88]/20'
+                  ? 'bg-[#00f3ff]/10 border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff]/20'
+                  : 'bg-[#00ff88]/10 border-[#00ff88] text-[#00ff88] hover:bg-[#00ff88]/20'
                   }`}
               >
                 {isLoading ? (
