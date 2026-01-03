@@ -1,0 +1,21 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="40" fill="#050505"/>
+  <rect x="4" y="4" width="184" height="184" rx="36" stroke="#00f3ff" stroke-width="2"/>
+  
+  <!-- Q Letter -->
+  <text x="38" y="133" font-family="JetBrains Mono, monospace" font-size="96" font-weight="bold" fill="#00f3ff">Q</text>
+  
+  <!-- C Letter -->
+  <text x="100" y="133" font-family="JetBrains Mono, monospace" font-size="96" font-weight="bold" fill="#00ff88">C</text>
+  
+  <!-- Bottom accent line -->
+  <line x1="28" y1="155" x2="164" y2="155" stroke="url(#gradient192)" stroke-width="3"/>
+  
+  <defs>
+    <linearGradient id="gradient192" x1="28" y1="0" x2="164" y2="0">
+      <stop offset="0%" stop-color="#00f3ff"/>
+      <stop offset="50%" stop-color="#00ff88"/>
+      <stop offset="100%" stop-color="#00f3ff"/>
+    </linearGradient>
+  </defs>
+</svg>

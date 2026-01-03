@@ -1,0 +1,21 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="180" height="180" rx="37" fill="#050505"/>
+  <rect x="3" y="3" width="174" height="174" rx="34" stroke="#00f3ff" stroke-width="2"/>
+  
+  <!-- Q Letter -->
+  <text x="35" y="125" font-family="JetBrains Mono, monospace" font-size="90" font-weight="bold" fill="#00f3ff">Q</text>
+  
+  <!-- C Letter -->
+  <text x="95" y="125" font-family="JetBrains Mono, monospace" font-size="90" font-weight="bold" fill="#00ff88">C</text>
+  
+  <!-- Bottom accent line -->
+  <line x1="25" y1="145" x2="155" y2="145" stroke="url(#gradientApple)" stroke-width="3"/>
+  
+  <defs>
+    <linearGradient id="gradientApple" x1="25" y1="0" x2="155" y2="0">
+      <stop offset="0%" stop-color="#00f3ff"/>
+      <stop offset="50%" stop-color="#00ff88"/>
+      <stop offset="100%" stop-color="#00f3ff"/>
+    </linearGradient>
+  </defs>
+</svg>
