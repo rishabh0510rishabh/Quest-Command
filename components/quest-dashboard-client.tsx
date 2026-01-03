@@ -81,7 +81,35 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false)
+  const [streak, setStreak] = useState(0)
   const supabase = createClient()
+
+  // Streak Logic
+  useEffect(() => {
+    const today = new Date().toDateString()
+    const lastLogin = localStorage.getItem(`last_login_${user.id}`)
+    const currentStreak = Number(localStorage.getItem(`streak_${user.id}`) || 0)
+
+    if (lastLogin !== today) {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+
+      if (lastLogin === yesterday.toDateString()) {
+        // Continued streak
+        const newStreak = currentStreak + 1
+        setStreak(newStreak)
+        localStorage.setItem(`streak_${user.id}`, String(newStreak))
+      } else {
+        // Broken streak (except if first time)
+        const newStreak = lastLogin ? 1 : 1
+        setStreak(newStreak)
+        localStorage.setItem(`streak_${user.id}`, String(newStreak))
+      }
+      localStorage.setItem(`last_login_${user.id}`, today)
+    } else {
+      setStreak(currentStreak)
+    }
+  }, [user.id])
 
   // Offline Detection
   useEffect(() => {
@@ -402,6 +430,7 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
           xp={profile.xp}
           level={profile.level}
           displayName={profile.display_name}
+          streak={streak}
           onEditProfile={() => setIsSettingsOpen(true)}
           onOpenAnalytics={() => setIsAnalyticsOpen(true)}
         />
@@ -452,6 +481,18 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
         onClose={() => setIsSettingsOpen(false)}
         onSubmit={handleUpdateProfile}
         profile={profile}
+        stats={{
+          completed: archivedQuests.length,
+          streak: streak,
+          nightOwl: archivedQuests.some(q => {
+            // Check if any completed quest was completed after 10 PM (22:00)
+            // Since we don't have 'completed_at', we'll approximate with 'deadline' or assume false for now to avoid errors
+            // For a real app, we'd enable a 'completed_at' field.
+            // Let's just return false or map it to a "late deadline" for fun
+            const d = new Date(q.deadline)
+            return d.getHours() >= 22
+          })
+        }}
       />
       <AnalyticsModal
         isOpen={isAnalyticsOpen}

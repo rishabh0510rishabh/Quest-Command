@@ -14,10 +14,12 @@ interface ProfileStatsProps {
   xp: number
   level: number
   displayName: string
+  streak?: number
   onEditProfile: () => void
   onOpenAnalytics: () => void
 }
-export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, level, displayName, onEditProfile, onOpenAnalytics }: ProfileStatsProps) {
+
+export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, level, displayName, streak = 0, onEditProfile, onOpenAnalytics }: ProfileStatsProps) {
   const xpProgress = ((xp % 3) / 3) * 100
 
   return (
@@ -63,6 +65,24 @@ export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, l
           </div>
           <p className="text-white mt-2 font-bold tracking-widest">{displayName}</p>
           <p className="text-[#666] text-xs">CLEARANCE: ALPHA</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-3 bg-[#0a0a0a] rounded border border-[#1a1a1a] flex items-center justify-between group-hover:border-[#00f3ff]/30 transition-colors">
+            <div>
+              <div className="text-xs text-[#666] mb-1">COMPLETED</div>
+              <div className="text-xl font-bold text-[#00f3ff]">{completedQuests}</div>
+            </div>
+            <Trophy className="w-5 h-5 text-[#00f3ff]/50 group-hover:text-[#00f3ff] transition-colors" />
+          </div>
+
+          <div className="p-3 bg-[#0a0a0a] rounded border border-[#1a1a1a] flex items-center justify-between group-hover:border-[#ff003c]/30 transition-colors">
+            <div>
+              <div className="text-xs text-[#666] mb-1">STREAK</div>
+              <div className="text-xl font-bold text-[#ff9900]">{streak} 🔥</div>
+            </div>
+            <Zap className="w-5 h-5 text-[#ff9900]/50 group-hover:text-[#ff9900] transition-colors" />
+          </div>
         </div>
 
         {/* Level */}
