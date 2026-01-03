@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { Wifi, WifiOff, Database, AlertTriangle, RefreshCw, LogOut, User } from "lucide-react"
+import { Wifi, WifiOff, Database, AlertTriangle, RefreshCw, LogOut, User, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -57,8 +57,12 @@ export function SyncBar({ isOnline, onToggle, user }: SyncBarProps) {
                   whileTap={{ scale: 0.95 }}
                   className="flex items-center gap-2 px-3 py-1.5 rounded border border-[#ff003c]/50 text-[#ff003c] text-xs tracking-wider hover:bg-[#ff003c]/10 transition-all disabled:opacity-50"
                 >
-                  <LogOut className="w-3 h-3" />
-                  <span className="hidden md:inline">DISCONNECT</span>
+                  {isLoggingOut ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <LogOut className="w-3 h-3" />
+                  )}
+                  <span className="hidden md:inline">{isLoggingOut ? "DISCONNECTING..." : "DISCONNECT"}</span>
                 </motion.button>
               </div>
             )}
