@@ -33,10 +33,10 @@ export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, l
         <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#00f3ff]" />
         <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#00f3ff]" />
 
-        {/* Edit Button (Visible on hover/group-hover) */}
+        {/* Edit Button */}
         <button
           onClick={onEditProfile}
-          className="absolute top-2 right-2 p-2 text-[#00f3ff]/50 hover:text-[#00f3ff] transition-colors z-20"
+          className="absolute top-14 right-4 p-1.5 rounded border border-[#00f3ff]/30 bg-[#00f3ff]/10 text-[#00f3ff] hover:bg-[#00f3ff]/20 hover:border-[#00f3ff] transition-all z-20"
           aria-label="Edit Profile"
         >
           <Settings className="w-4 h-4" />
