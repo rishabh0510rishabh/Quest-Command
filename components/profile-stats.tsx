@@ -3,7 +3,9 @@
 import type React from "react"
 
 import { motion } from "framer-motion"
-import { Shield, Sword, Trophy, Zap } from "lucide-react"
+import { Shield, Sword, Trophy, Zap, Settings } from "lucide-react"
+
+// ...
 
 interface ProfileStatsProps {
   completedQuests: number
@@ -11,9 +13,10 @@ interface ProfileStatsProps {
   totalQuests: number
   xp: number
   level: number
+  displayName: string
+  onEditProfile: () => void
 }
-
-export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, level }: ProfileStatsProps) {
+export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, level, displayName, onEditProfile }: ProfileStatsProps) {
   const xpProgress = ((xp % 3) / 3) * 100
 
   return (
@@ -23,12 +26,21 @@ export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, l
       transition={{ delay: 0.3 }}
       className="lg:w-72 shrink-0"
     >
-      <div className="glass rounded-lg border border-[#1a1a1a] p-4 space-y-6 relative overflow-hidden">
+      <div className="glass rounded-lg border border-[#1a1a1a] p-4 space-y-6 relative overflow-hidden group">
         {/* Corner accents */}
         <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#00f3ff]" />
         <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#00f3ff]" />
         <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#00f3ff]" />
         <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#00f3ff]" />
+
+        {/* Edit Button (Visible on hover/group-hover) */}
+        <button
+          onClick={onEditProfile}
+          className="absolute top-2 right-2 p-2 text-[#00f3ff]/50 hover:text-[#00f3ff] transition-colors z-20"
+          aria-label="Edit Profile"
+        >
+          <Settings className="w-4 h-4" />
+        </button>
 
         {/* Header */}
         <div className="text-center">
@@ -36,7 +48,7 @@ export function ProfileStats({ completedQuests, activeQuests, totalQuests, xp, l
           <div className="w-16 h-16 mx-auto rounded-full border-2 border-[#00f3ff] flex items-center justify-center bg-[#0a0a0a]">
             <Shield className="w-8 h-8 text-[#00f3ff]" />
           </div>
-          <p className="text-white mt-2 font-bold">AGENT_X7</p>
+          <p className="text-white mt-2 font-bold tracking-widest">{displayName}</p>
           <p className="text-[#666] text-xs">CLEARANCE: ALPHA</p>
         </div>
 

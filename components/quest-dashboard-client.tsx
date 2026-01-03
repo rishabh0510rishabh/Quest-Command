@@ -7,6 +7,7 @@ import { QuestGrid } from "@/components/quest-grid"
 import { ArchiveSection } from "@/components/archive-section"
 import { NewQuestButton } from "@/components/new-quest-button"
 import { NewQuestModal } from "@/components/new-quest-modal"
+import { SettingsModal } from "@/components/settings-modal"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import type { Quest, QuestStatus, Profile } from "@/lib/types"
@@ -78,6 +79,7 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
   const [quests, setQuests] = useState<Quest[]>(initialQuests)
   const [profile, setProfile] = useState<Profile>(userProfile)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const supabase = createClient()
 
   // Offline Detection
@@ -369,6 +371,22 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
     await supabase.from('quests').update({ status: "NOT_STARTED" }).eq('id', id)
   }
 
+  const handleUpdateProfile = async (data: Partial<Profile>) => {
+    // Optimistic Update
+    const updatedProfile = { ...profile, ...data }
+    setProfile(updatedProfile)
+
+    try {
+      const { error } = await supabase.from('profiles').update(data).eq('id', user.id)
+      if (error) throw error
+      toast.success("PROFILE UPDATED SUCCESSFULLY")
+    } catch (error) {
+      console.error(error)
+      setProfile(profile) // Revert
+      toast.error("UPDATE FAILED")
+    }
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       <SyncBar isOnline={isOnline} onToggle={() => setIsOnline(!isOnline)} user={user} />
@@ -376,7 +394,15 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
       <div
         className={`flex flex-col lg:flex-row gap-6 p-4 lg:p-6 ${isOnline ? "pt-20" : "pt-32"} transition-all duration-300`}
       >
-        <ProfileStats completedQuests={profile.xp} activeQuests={activeCount} totalQuests={totalQuests} xp={profile.xp} level={profile.level} />
+        <ProfileStats
+          completedQuests={profile.xp} // Note: This mapping seems odd (xp vs completed), keeping logic as is effectively
+          activeQuests={activeCount}
+          totalQuests={totalQuests}
+          xp={profile.xp}
+          level={profile.level}
+          displayName={profile.display_name}
+          onEditProfile={() => setIsSettingsOpen(true)}
+        />
 
         <main className="flex-1 space-y-8">
           <QuestGrid
@@ -419,6 +445,12 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
 
       <NewQuestButton onClick={() => setIsModalOpen(true)} />
       <NewQuestModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleAddQuest} />
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onSubmit={handleUpdateProfile}
+        profile={profile}
+      />
     </div>
   )
 }
