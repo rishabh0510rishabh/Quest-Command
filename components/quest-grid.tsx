@@ -9,10 +9,11 @@ interface QuestGridProps {
   quests: Quest[]
   onStatusChange: (id: string, status: QuestStatus, isRecurringReset?: boolean) => void
   onDelete: (id: string) => void
+  onEdit?: (quest: Quest) => void
   variant?: "default" | "danger" | "urgent" | "muted"
 }
 
-export function QuestGrid({ title, quests, onStatusChange, onDelete, variant = "default" }: QuestGridProps) {
+export function QuestGrid({ title, quests, onStatusChange, onDelete, onEdit, variant = "default" }: QuestGridProps) {
   // Simplified container - no stagger to prevent visibility issues with dynamic items
   const container = {
     hidden: { opacity: 1 },
@@ -50,7 +51,7 @@ export function QuestGrid({ title, quests, onStatusChange, onDelete, variant = "
         className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
       >
         {quests.map((quest) => (
-          <QuestCard key={quest.id} quest={quest} onStatusChange={onStatusChange} onDelete={onDelete} />
+          <QuestCard key={quest.id} quest={quest} onStatusChange={onStatusChange} onDelete={onDelete} onEdit={onEdit} />
         ))}
       </motion.div>
     </div>

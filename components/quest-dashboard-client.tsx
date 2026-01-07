@@ -6,7 +6,7 @@ import { ProfileStats } from "@/components/profile-stats"
 import { QuestGrid } from "@/components/quest-grid"
 import { ArchiveSection } from "@/components/archive-section"
 import { NewQuestButton } from "@/components/new-quest-button"
-import { NewQuestModal } from "@/components/new-quest-modal"
+import { QuestModal } from "@/components/new-quest-modal"
 import { SettingsModal } from "@/components/settings-modal"
 import { AnalyticsModal } from "@/components/analytics-modal"
 import { createClient } from "@/lib/supabase/client"
@@ -79,6 +79,7 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
   const [quests, setQuests] = useState<Quest[]>(initialQuests)
   const [profile, setProfile] = useState<Profile>(userProfile)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingQuest, setEditingQuest] = useState<Quest | null>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false)
   const [streak, setStreak] = useState(0)
@@ -121,6 +122,28 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
       window.removeEventListener("offline", updateOnlineStatus)
     }
   }, [])
+
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in an input
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
+
+      if (e.key.toLowerCase() === 'n') {
+        e.preventDefault()
+        setIsModalOpen(true)
+      }
+
+      if (e.key === 'Escape') {
+        if (isModalOpen) handleModalClose()
+        if (isSettingsOpen) setIsSettingsOpen(false)
+        if (isAnalyticsOpen) setIsAnalyticsOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isModalOpen, isSettingsOpen, isAnalyticsOpen])
 
   // Sync Mechanism: Auto-upload offline quests when connection returns
   const syncingIdsRef = useMemo(() => new Set<string>(), [])
@@ -400,6 +423,49 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
     await supabase.from('quests').update({ status: "NOT_STARTED" }).eq('id', id)
   }
 
+  const handleEditQuest = (quest: Quest) => {
+    setEditingQuest(quest)
+    setIsModalOpen(true)
+  }
+
+  const handleQuestSubmit = async (questData: Omit<Quest, "id" | "user_id" | "created_at" | "status">) => {
+    if (editingQuest) {
+      // Handle Update
+      // Optimistic update
+      setQuests(prev => prev.map(q => q.id === editingQuest.id ? { ...q, ...questData } : q))
+
+      try {
+        const { error } = await supabase
+          .from('quests')
+          .update({
+            title: questData.title,
+            notes: questData.notes,
+            notion_url: questData.notion_url,
+            deadline: questData.deadline,
+            frequency: questData.frequency
+          })
+          .eq('id', editingQuest.id)
+
+        if (error) throw error
+        toast.success("PROTOCOL UPDATED")
+      } catch (error) {
+        // Revert on error
+        setQuests(prev => prev.map(q => q.id === editingQuest.id ? editingQuest : q))
+        toast.error("UPDATE FAILED")
+      }
+
+      setEditingQuest(null)
+    } else {
+      // Handle Create
+      await handleAddQuest(questData)
+    }
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setEditingQuest(null)
+  }
+
   const handleUpdateProfile = async (data: Partial<Profile>) => {
     // Optimistic Update
     const updatedProfile = { ...profile, ...data }
@@ -441,6 +507,7 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
             quests={categorizedQuests.overdue}
             onStatusChange={handleStatusChange}
             onDelete={handleDeleteQuest}
+            onEdit={handleEditQuest}
             variant="danger"
           />
           <QuestGrid
@@ -448,6 +515,7 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
             quests={categorizedQuests.today}
             onStatusChange={handleStatusChange}
             onDelete={handleDeleteQuest}
+            onEdit={handleEditQuest}
             variant="urgent"
           />
           <QuestGrid
@@ -455,18 +523,21 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
             quests={categorizedQuests.tomorrow}
             onStatusChange={handleStatusChange}
             onDelete={handleDeleteQuest}
+            onEdit={handleEditQuest}
           />
           <QuestGrid
             title="THIS_WEEK://"
             quests={categorizedQuests.thisWeek}
             onStatusChange={handleStatusChange}
             onDelete={handleDeleteQuest}
+            onEdit={handleEditQuest}
           />
           <QuestGrid
             title="LATER_MISSIONS://"
             quests={categorizedQuests.later}
             onStatusChange={handleStatusChange}
             onDelete={handleDeleteQuest}
+            onEdit={handleEditQuest}
             variant="muted"
           />
 
@@ -475,7 +546,12 @@ export function QuestDashboardClient({ user, initialQuests, userProfile }: Quest
       </div>
 
       <NewQuestButton onClick={() => setIsModalOpen(true)} />
-      <NewQuestModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleAddQuest} />
+      <QuestModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSubmit={handleQuestSubmit}
+        initialData={editingQuest}
+      />
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}

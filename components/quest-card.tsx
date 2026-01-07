@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { AlertTriangle, ExternalLink, Trash2, Skull, RefreshCcw } from "lucide-react"
+import { AlertTriangle, ExternalLink, Trash2, Skull, RefreshCcw, Edit2 } from "lucide-react"
 import { StatusToggle } from "./status-toggle"
 import type { Quest, QuestStatus } from "@/lib/types"
 
@@ -10,9 +10,10 @@ interface QuestCardProps {
   quest: Quest
   onStatusChange: (id: string, status: QuestStatus, isRecurringReset?: boolean) => void
   onDelete: (id: string) => void
+  onEdit?: (quest: Quest) => void
 }
 
-export function QuestCard({ quest, onStatusChange, onDelete }: QuestCardProps) {
+export function QuestCard({ quest, onStatusChange, onDelete, onEdit }: QuestCardProps) {
   // Initialize with null to avoid hydration mismatch - will calculate on client
   const [timeLeft, setTimeLeft] = useState<ReturnType<typeof calculateTimeLeft> | null>(null)
   const [isResetting, setIsResetting] = useState(false)
@@ -205,9 +206,18 @@ export function QuestCard({ quest, onStatusChange, onDelete }: QuestCardProps) {
               {quest.title}
             </h3>
           </div>
-          <button onClick={() => onDelete(quest.id)} className="text-[#666] hover:text-[#ff003c] transition-colors p-1">
-            <Trash2 className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onEdit?.(quest)}
+              className="text-[#666] hover:text-[#00f3ff] transition-colors p-1"
+              title="Edit Mission Intel"
+            >
+              <Edit2 className="w-4 h-4" />
+            </button>
+            <button onClick={() => onDelete(quest.id)} className="text-[#666] hover:text-[#ff003c] transition-colors p-1">
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Status Toggle - use custom handler */}

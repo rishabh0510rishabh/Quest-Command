@@ -2,15 +2,16 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Crosshair, Zap, Calendar, CalendarDays, CalendarRange } from "lucide-react"
 import type { Quest, QuestFrequency } from "@/lib/types"
 
-interface NewQuestModalProps {
+interface QuestModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (quest: Omit<Quest, "id" | "user_id" | "created_at" | "status">) => void
+  initialData?: Quest | null
 }
 
 const frequencyOptions: { value: QuestFrequency; label: string; icon: React.ElementType }[] = [
@@ -20,12 +21,34 @@ const frequencyOptions: { value: QuestFrequency; label: string; icon: React.Elem
   { value: "MONTHLY", label: "MONTHLY RESET", icon: CalendarRange },
 ]
 
-export function NewQuestModal({ isOpen, onClose, onSubmit }: NewQuestModalProps) {
+export function QuestModal({ isOpen, onClose, onSubmit, initialData }: QuestModalProps) {
   const [title, setTitle] = useState("")
   const [notes, setNotes] = useState("")
   const [notionUrl, setNotionUrl] = useState("")
   const [deadline, setDeadline] = useState("")
   const [frequency, setFrequency] = useState<QuestFrequency>("SINGLE")
+
+  useEffect(() => {
+    if (isOpen && initialData) {
+      setTitle(initialData.title)
+      setNotes(initialData.notes || "")
+      setNotionUrl(initialData.notion_url || "")
+      // Format date for datetime-local input (YYYY-MM-DDThh:mm)
+      const date = new Date(initialData.deadline)
+      const formattedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16)
+      setDeadline(formattedDate)
+      setFrequency(initialData.frequency)
+    } else if (isOpen) {
+      // Reset for new quest
+      setTitle("")
+      setNotes("")
+      setNotionUrl("")
+      setDeadline("")
+      setFrequency("SINGLE")
+    }
+  }, [isOpen, initialData])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,18 +57,22 @@ export function NewQuestModal({ isOpen, onClose, onSubmit }: NewQuestModalProps)
     onSubmit({
       title: title.toUpperCase(),
       notes,
-      notion_url: notionUrl || "https://notion.so",
+      notion_url: notionUrl || undefined,
       deadline: new Date(deadline).toISOString(),
       frequency,
     })
 
-    setTitle("")
-    setNotes("")
-    setNotionUrl("")
-    setDeadline("")
-    setFrequency("SINGLE")
+    if (!initialData) {
+      setTitle("")
+      setNotes("")
+      setNotionUrl("")
+      setDeadline("")
+      setFrequency("SINGLE")
+    }
     onClose()
   }
+
+  const isEdit = !!initialData
 
   return (
     <AnimatePresence>
@@ -78,7 +105,7 @@ export function NewQuestModal({ isOpen, onClose, onSubmit }: NewQuestModalProps)
               <div className="flex items-center justify-between p-4 border-b border-[#1a1a1a]">
                 <div className="flex items-center gap-2">
                   <Crosshair className="w-5 h-5 text-[#00f3ff]" />
-                  <h2 className="text-[#00f3ff] font-bold tracking-widest">NEW QUEST INITIALIZATION</h2>
+                  <h2 className="text-[#00f3ff] font-bold tracking-widest">{isEdit ? "MODIFY OBJECTIVE" : "NEW QUEST INITIALIZATION"}</h2>
                 </div>
                 <button onClick={onClose} className="text-[#666] hover:text-[#ff003c] transition-colors">
                   <X className="w-5 h-5" />
@@ -213,7 +240,7 @@ export function NewQuestModal({ isOpen, onClose, onSubmit }: NewQuestModalProps)
                     boxShadow: "0 0 20px rgba(0, 243, 255, 0.3)",
                   }}
                 >
-                  DEPLOY QUEST
+                  {isEdit ? "UPDATE PROTOCOL" : "DEPLOY QUEST"}
                 </motion.button>
               </form>
 
